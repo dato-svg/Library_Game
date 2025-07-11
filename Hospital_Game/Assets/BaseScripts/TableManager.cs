@@ -6,6 +6,8 @@ namespace BaseScripts
     {
         [SerializeField] private Transform seat1;
         [SerializeField] private Transform seat2;
+        
+        [SerializeField] private Transform tableMoneyPointTransform;
 
         private bool seat1Taken = false;
         private bool seat2Taken = false;
