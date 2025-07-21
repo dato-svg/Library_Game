@@ -8,6 +8,8 @@ namespace BaseScripts
         [SerializeField] private int money;
         [SerializeField] private TextMeshProUGUI moneyText;
 
+        public int Money => money;
+        
         private void Start() => 
             ShowMoney();
 

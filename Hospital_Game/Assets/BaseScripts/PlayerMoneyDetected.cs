@@ -19,6 +19,7 @@ namespace BaseScripts
         [SerializeField] private GameObject moneyPrefab_4;
         
         
+        
         private Coroutine coroutine;
 
 
@@ -104,7 +105,11 @@ namespace BaseScripts
         {
             wallet.AddMoney(totalMoney);
             totalMoney = 0;
-            gameObject.SetActive(false);
+            collider.enabled = false;
+            moneyPrefab_1.SetActive(false);
+            moneyPrefab_2.SetActive(false);
+            moneyPrefab_3.SetActive(false);
+            moneyPrefab_4.SetActive(false);
         }
     }
 }

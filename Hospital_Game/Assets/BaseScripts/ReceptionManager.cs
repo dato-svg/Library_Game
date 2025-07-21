@@ -8,21 +8,23 @@ namespace BaseScripts
     public class ReceptionManager : MonoBehaviour
     {
         [SerializeField] private Transform receptionPoint;
-        [SerializeField] private Transform libraryPoint;
-        
-        [SerializeField] private List<LibraryManager> libraryManagers;
-        [SerializeField] private List<TableManager> tableManagers;
-        
+
+        public List<LibraryManager> libraryManagers;
+        public List<TableManager> tableManagers;
+
         public List<Readers> readers;
-        
+
         [SerializeField] public bool playerGiveBook;
-        
+
         [SerializeField] private Wallet wallet;
-        
-        [SerializeField] private PlayerMoneyDetected  receptionMoneyDetected;
-        [SerializeField] private PlayerMoneyDetected  tableMoneyDetected;
+
+        [SerializeField] private List<PlayerMoneyDetected> tableMoneyDetectors;
+
+        [SerializeField] private PlayerMoneyDetected receptionMoneyDetected;
 
         [SerializeField] private ReadersSpawner readersSpawner;
+
+        public bool isReaderWaiting;
 
         private void Start()
         {
@@ -30,9 +32,10 @@ namespace BaseScripts
         }
 
         [ContextMenu("SetNewReader")]
-        private void SetNewReader()
+        public void SetNewReader()
         {
             playerGiveBook = false;
+            isReaderWaiting = false;
 
             if (readers.Count == 0)
             {
@@ -48,6 +51,7 @@ namespace BaseScripts
 
             movement.MoveTo(receptionPoint.position, () =>
             {
+                isReaderWaiting = true;
                 StartCoroutine(TryReadProcess(reader));
             });
         }
@@ -56,77 +60,141 @@ namespace BaseScripts
         {
             while (!playerGiveBook)
                 yield return null;
-            
+
+            TableManager targetTable = null;
+            Transform targetSeat = null;
+
             foreach (var table in tableManagers)
             {
-                if (table.TrySits(out Transform seat, out int seatIndex))
+                if (!table.book1Spawned && !table.book2Spawned && table.TrySits(out Transform seat, out int seatIndex))
                 {
-                    StartCoroutine(HandleReaderFlow(reader, table, seat));
-                    yield break;
+                    targetTable = table;
+                    targetSeat = seat;
+                    break;
                 }
             }
-            
-            reader.Wait();
-        }
 
-        private IEnumerator HandleReaderFlow(Readers reader, TableManager table, Transform seat)
-        {
-            reader.Wait();
+            if (targetTable == null)
+            {
+                Debug.LogWarning("Нет свободных столов. Читатель уходит.");
+
+                var movement = reader.GetComponent<ReadersMovement>();
+                if (movement != null)
+                {
+                    Vector3 exitPoint = new Vector3(-15.79f, 0, 17.98f);
+
+                    yield return ShowReaderReaction(reader);
+
+                    movement.MoveTo(exitPoint, () =>
+                    {
+                        Destroy(movement.gameObject);
+                        readersSpawner.canSpawn = true;
+                        readersSpawner.ActiveCo();
+                        Debug.Log("Читатель ушёл, так как не было свободных столов.");
+                    });
+                }
+
+                yield break;
+            }
+
+            Book foundBook = null;
+            LibraryManager sourceLibrary = null;
 
             foreach (var library in libraryManagers)
             {
-                if (library.TryGetBook(reader.DesiredBook))
+                if (library.TryGetBook(reader.DesiredBook, out Book book))
                 {
-                    receptionMoneyDetected.collider.enabled = true;
-                    receptionMoneyDetected.ActiveCoroutine();
-
-                    SetNewReader();
-                    
-                    var move = reader.GetComponent<ReadersMovement>();
-                    
-                    move.MoveTo(libraryPoint.position, () =>
-                    {
-                       
-                        //readersSpawner
-                            
-                            
-                        move.MoveTo(seat.position, () =>
-                        {
-                            reader.ReadBook();
-                            StartCoroutine(ReaderFinishRoutine(reader, table));
-                        });
-                    });
-
-                    yield break;
+                    foundBook = book;
+                    sourceLibrary = library;
+                    break;
                 }
             }
 
-            reader.Wait();
+            if (foundBook == null)
+            {
+                Debug.LogWarning($"Книга {reader.DesiredBook} не найдена ни в одной библиотеке.");
+                reader.Wait();
+
+                yield return ShowReaderReaction(reader);
+
+                yield break;
+            }
+
+            reader.currentBook = foundBook;
+
+            receptionMoneyDetected.collider.enabled = true;
+            receptionMoneyDetected.ActiveCoroutine();
+
+            readersSpawner.canSpawn = true;
+            readersSpawner.ActiveCo();
+
+            SetNewReader();
+
+            var move = reader.GetComponent<ReadersMovement>();
+
+            move.MoveTo(sourceLibrary.transform.position, () =>
+            {
+                reader.currentBook.RemoveFromLibrary();
+
+                move.MoveTo(targetSeat.position, () =>
+                {
+                    Vector3 lookTarget = targetSeat.forward + targetSeat.position;
+                    reader.transform.LookAt(lookTarget);
+
+                    reader.ReadBook();
+                    StartCoroutine(ReaderFinishRoutine(reader, targetTable));
+                });
+            });
         }
 
         private IEnumerator ReaderFinishRoutine(Readers reader, TableManager table)
         {
             yield return new WaitForSeconds(3f);
 
-            tableMoneyDetected.collider.enabled = true;
-            tableMoneyDetected.ActiveCoroutine();
-            
+            int tableIndex = tableManagers.IndexOf(table);
+            if (tableIndex >= 0 && tableIndex < tableMoneyDetectors.Count)
+            {
+                var detector = tableMoneyDetectors[tableIndex];
+                detector.collider.enabled = true;
+                detector.ActiveCoroutine();
+            }
+            else
+            {
+                Debug.LogWarning("Не найдена зона оплаты для данного стола.");
+            }
+
             table.ReleaseSeats();
+
+            if (reader.currentBookSpawn != null)
+            {
+                table.SpawnBookOnTable(reader.currentBookSpawn);
+                reader.currentBook = null;
+            }
 
             var move = reader.GetComponent<ReadersMovement>();
             if (move != null)
             {
-                Vector3 exitPoint = new Vector3(-15.79f, 0, 17.98f);
-
+                Vector3 exitPoint = new Vector3(-10.96f, 1.53f, 19.04f);
                 move.MoveTo(exitPoint, () =>
                 {
-                    Debug.Log("He leaves the table");
-                    //  reader.Leave();
+                    Destroy(move.gameObject);
+                    Debug.Log("Читатель ушёл.");
                 });
             }
-
-            yield return null;
         }
 
+        private IEnumerator ShowReaderReaction(Readers reader)
+        {
+            Transform child = reader.transform.GetChild(0);
+
+            if (child != null)
+            {
+                child.gameObject.SetActive(true);
+                yield return new WaitForSeconds(1f);
+                child.gameObject.SetActive(false);
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 }

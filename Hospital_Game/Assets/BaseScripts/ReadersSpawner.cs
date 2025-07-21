@@ -2,21 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace BaseScripts
 {
     public class ReadersSpawner : MonoBehaviour
     {
-        [SerializeField] private List<GameObject> readerPrefabs;
+        public List<GameObject> readerPrefabs;
         [SerializeField] private ReceptionManager receptionManager;
-        
-        [SerializeField] private bool canSpawn;
 
-        private int index;
+        public bool canSpawn;
+
+        private int currentIndex = 1;
 
         [ContextMenu("ActiveCo")]
-        private void ActiveCo()
+        public void ActiveCo()
         {
             StartCoroutine(SpawnReaders());
         }
@@ -24,22 +23,30 @@ namespace BaseScripts
         public IEnumerator SpawnReaders()
         {
             yield return null;
+
             while (!canSpawn)
-            {
                 yield return null;
-            }
 
             while (canSpawn)
             {
-                index = Random.Range(0, readerPrefabs.Count);
+                GameObject prefab = readerPrefabs[currentIndex];
+
+                Readers reader = Instantiate(prefab, transform.position, quaternion.identity)
+                    .GetComponent<Readers>();
                 
-                Readers reader = Instantiate(readerPrefabs[index],
-                    transform.position, 
-                    quaternion.identity)
-                    .gameObject.GetComponent<Readers>();
-                
+                Transform emotion = reader.transform.GetChild(0);
+                if (emotion != null)
+                {
+                    emotion.gameObject.SetActive(false);
+                }
+
                 receptionManager.readers.Add(reader);
+                receptionManager.SetNewReader();
                 canSpawn = false;
+
+                currentIndex++;
+                if (currentIndex >= readerPrefabs.Count)
+                    currentIndex = 0;
             }
         }
     }

@@ -6,32 +6,51 @@ namespace BaseScripts
     public class LibraryManager : MonoBehaviour
     {
         [SerializeField] private List<Book> books;
+        
+        public List<Transform> shelfSpawnsPoint;
+        
+        public BooksEnum libraryBookType;
 
         private void Start() => 
-            books = new List<Book>(GetComponentsInChildren<Book>());
+            UpdateBooksList();
 
+        public void AddAllBooks() => 
+            UpdateBooksList();
 
-        private void RemoveBook(Book book)
+        private void UpdateBooksList()
         {
-            Destroy(book.gameObject);
-            books.Remove(book);
+            books = new List<Book>();
+
+            foreach (var book in GetComponentsInChildren<Book>())
+            {
+                if (book == null) continue;
+
+                book.SetLibrary(this);
+                books.Add(book);
+            }
         }
 
-        private void AddBook(Book book) => 
-            books.Add(book);
-        
-        
-        public bool TryGetBook(BooksEnum requestedType)
+        public void RemoveBook(Book book)
         {
-            foreach (var book in books)
+            if (books.Contains(book))
             {
-                if (book.BookType == requestedType)
+                books.Remove(book);
+                Destroy(book.gameObject);
+            }
+        }
+
+        public bool TryGetBook(BooksEnum desiredBook, out Book book)
+        {
+            foreach (var b in books)
+            {
+                if (b.BookType == desiredBook)
                 {
-                    RemoveBook(book);
+                    book = b;
                     return true;
                 }
             }
 
+            book = null;
             return false;
         }
     }

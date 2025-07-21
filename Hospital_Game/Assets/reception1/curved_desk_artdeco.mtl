@@ -1,0 +1,85 @@
+newmtl curved_desk_artdeco_stripe_2_MatSG
+Ni 1.6
+Ka 0 0 0
+d 1.0
+Ke 0.0
+Kd 0 0 0
+adobe_map_normal curved_desk_artdeco/curved_desk_artdeco_stripe_2_Mat_normal.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness curved_desk_artdeco/curved_desk_artdeco_stripe_2_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm curved_desk_artdeco/curved_desk_artdeco_stripe_2_Mat_metallic.png
+Ns 16
+map_Kd curved_desk_artdeco/curved_desk_artdeco_stripe_2_Mat_baseColor.png
+newmtl curved_desk_artdeco_extruding_designs_MatSG
+Ni 1.6
+Ka 0 0 0
+d 1.0
+Ke 0.0
+Kd 0 0 0
+adobe_map_normal curved_desk_artdeco/curved_desk_artdeco_extruding_designs_Mat_normal.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness curved_desk_artdeco/curved_desk_artdeco_extruding_designs_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm curved_desk_artdeco/curved_desk_artdeco_extruding_designs_Mat_metallic.png
+Ns 16
+map_Kd curved_desk_artdeco/curved_desk_artdeco_extruding_designs_Mat_baseColor.png
+newmtl curved_desk_artdeco_stripe_1_MatSG
+Ni 1.6
+Ka 0 0 0
+d 1.0
+Ke 0.0
+Kd 0 0 0
+adobe_map_normal curved_desk_artdeco/curved_desk_artdeco_stripe_1_Mat_normal.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness curved_desk_artdeco/curved_desk_artdeco_stripe_1_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm curved_desk_artdeco/curved_desk_artdeco_stripe_1_Mat_metallic.png
+Ns 16
+map_Kd curved_desk_artdeco/curved_desk_artdeco_stripe_1_Mat_baseColor.png
+newmtl curved_desk_artdeco_desk_body_MatSG
+Ni 1.6
+Ka 0 0 0
+d 1.0
+Ke 0.0
+Kd 0 0 0
+adobe_map_normal curved_desk_artdeco/curved_desk_artdeco_desk_body_Mat_normal.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness curved_desk_artdeco/curved_desk_artdeco_desk_body_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm curved_desk_artdeco/curved_desk_artdeco_desk_body_Mat_metallic.png
+Ns 16
+map_Kd curved_desk_artdeco/curved_desk_artdeco_desk_body_Mat_baseColor.png
+newmtl curved_desk_artdeco_inside_flat_panels_MatSG
+Ni 1.6
+Ka 0 0 0
+d 1.0
+Ke 0.0
+Kd 0 0 0
+adobe_map_normal curved_desk_artdeco/curved_desk_artdeco_inside_flat_panels_Mat_normal.png
+Tr 0
+illum 7
+Ks 1 1 1
+adobe_translucence 0.0
+adobe_map_roughness curved_desk_artdeco/curved_desk_artdeco_inside_flat_panels_Mat_roughness.png
+adobe_interior_color 1.0 1.0 1.0
+adobe_density 0.0
+map_Pm curved_desk_artdeco/curved_desk_artdeco_inside_flat_panels_Mat_metallic.png
+Ns 16
+map_Kd curved_desk_artdeco/curved_desk_artdeco_inside_flat_panels_Mat_baseColor.png

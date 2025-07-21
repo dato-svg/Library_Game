@@ -9,9 +9,10 @@ namespace BaseScripts.NavMovement
         [SerializeField] private NavMeshAgent navMeshAgent;
         [SerializeField] private float stoppingDistance = 0.5f;
 
+        public CharacterAnimation characterAnimation;
         private Action onArrival;
         private bool isMoving = false;
-
+        
         private void Update()
         {
             if (!isMoving) return;
@@ -19,6 +20,7 @@ namespace BaseScripts.NavMovement
             if (!navMeshAgent.pathPending && navMeshAgent.remainingDistance <= stoppingDistance)
             {
                 isMoving = false;
+                characterAnimation.StopMove();
                 onArrival?.Invoke();
             }
         }
@@ -28,6 +30,7 @@ namespace BaseScripts.NavMovement
             isMoving = true;
             onArrival = onComplete;
             navMeshAgent.SetDestination(targetPosition);
+            characterAnimation.StartMove();
         }
 
         public void SetSpeed(float speed)
